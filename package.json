@@ -6,8 +6,8 @@
   "main": "dist/greenlet.js",
   "module": "dist/greenlet.m.js",
   "scripts": {
-    "build": "microbundle",
-    "test": "eslint *.js && karmatic"
+    "prepare": "microbundle",
+    "test": "eslint *.js && npm run -s prepare && karmatic"
   },
   "eslintConfig": {
     "extends": "eslint-config-developit"
