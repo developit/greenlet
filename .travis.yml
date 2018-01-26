@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - stable
+dist: trusty
+sudo: false
+addons:
+  chrome: stable
+cache:
+  npm: true
+  directories:
+    - node_modules
