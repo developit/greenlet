@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/477k1ju.png" width="1000" alt="Greenlet">
+  <img src="https://i.imgur.com/TtH6Q2T.png" width="1000" alt="Greenlet">
 </p>
 
 ## Greenlet [![npm](https://img.shields.io/npm/v/greenlet.svg)](https://npm.im/greenlet) [![travis](https://travis-ci.org/developit/greenlet.svg?branch=master)](https://travis-ci.org/developit/greenlet)
