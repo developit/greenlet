@@ -1,7 +1,8 @@
 <p align="center">
-  <img src="https://i.imgur.com/iiCFjjf.png" width="144" height="150">
+  <img src="https://i.imgur.com/477k1ju.png" width="1000" alt="Greenlet">
 </p>
-<h1 align="center">Greenlet</h1>
+
+## Greenlet [![npm](https://img.shields.io/npm/v/greenlet.svg)](https://npm.im/greenlet) [![travis](https://travis-ci.org/developit/greenlet.svg?branch=master)](https://travis-ci.org/developit/greenlet)
 
 > Move an async function into its own thread.
 >
