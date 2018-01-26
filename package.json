@@ -1,0 +1,35 @@
+{
+  "name": "greenlet",
+  "version": "0.1.0",
+  "description": "Move an async function into its own thread.",
+  "source": "greenlet.js",
+  "main": "dist/greenlet.js",
+  "module": "dist/greenlet.m.js",
+  "scripts": {
+    "build": "microbundle",
+    "test": "eslint *.js && karmatic"
+  },
+  "eslintConfig": {
+    "extends": "eslint-config-developit"
+  },
+  "files": [
+    "greenlet.js"
+  ],
+  "repository": "developit/greenlet",
+  "keywords": [
+    "greenlet",
+    "thread",
+    "async",
+    "worker",
+    "web worker"
+  ],
+  "author": "Jason Miller <jason@developit.ca> (http://jasonformat.com)",
+  "license": "MIT",
+  "homepage": "https://github.com/developit/greenlet",
+  "devDependencies": {
+    "eslint": "^4.16.0",
+    "eslint-config-developit": "^1.1.1",
+    "karmatic": "^1.0.6",
+    "microbundle": "^0.4.2"
+  }
+}
