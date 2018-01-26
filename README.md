@@ -1,5 +1,7 @@
 # Greenlet
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/developit/greenlet.svg)](https://greenkeeper.io/)
+
 > Move an async function into its own thread.
 >
 > A simplified single-function version of [workerize](https://github.com/developit/workerize).
