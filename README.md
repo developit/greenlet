@@ -1,4 +1,7 @@
-# Greenlet
+<p align="center">
+  <img src="https://i.imgur.com/iiCFjjf.png" width="144" height="150">
+</p>
+<h1 align="center">Greenlet</h1>
 
 > Move an async function into its own thread.
 >
