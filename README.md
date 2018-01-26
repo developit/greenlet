@@ -18,6 +18,8 @@ npm i -S greenlet
 
 Accepts an async function with, produces a copy of it that runs within a Web Worker.
 
+> ⚠️ **Caveat:** the function you pass should be _pure_, since they get executed in an isolated scope.
+
 ```
 greenlet(Function) -> Function
 ```
