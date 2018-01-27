@@ -5,6 +5,7 @@
   "source": "greenlet.js",
   "main": "dist/greenlet.js",
   "module": "dist/greenlet.m.js",
+  "types": "./index.d.ts",
   "scripts": {
     "prepare": "microbundle",
     "test": "eslint *.js && npm run -s prepare && karmatic"
