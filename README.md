@@ -20,7 +20,7 @@ npm i -S greenlet
 
 Accepts an async function with, produces a copy of it that runs within a Web Worker.
 
-> ⚠️ **Caveat:** the function you pass should be _pure_, since they get executed in an isolated scope.
+> ⚠️ **Caveat:** the function you pass cannot rely on its surrounding scope, since it is executed in an isolated context.
 
 ```
 greenlet(Function) -> Function
