@@ -29,15 +29,21 @@ greenlet(Function) -> Function
 
 ## Example
 
+Greenlet is most effective when the work being done has relatively small inputs/outputs.
+
+One such example would be fetching a network resource when only a subset of the resulting information is needed:
+
 ```js
 import greenlet from 'greenlet'
 
-let get = greenlet(async url => {
-	let res = await fetch(url)
-	return await res.json()
+let getName = greenlet( async username => {
+    let url = `https://api.github.com/users/${username}`
+    let res = await fetch(url)
+    let profile = await res.json()
+    return profile.name
 })
 
-console.log(await get('/foo'))
+console.log(await getName('developit'))
 ```
 
 
