@@ -1,6 +1,6 @@
 {
   "name": "greenlet",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Move an async function into its own thread.",
   "source": "greenlet.js",
   "main": "dist/greenlet.js",
