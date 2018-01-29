@@ -10,6 +10,8 @@
 
 The name is somewhat of a poor choice, but it was [available on npm](https://npm.im/greenlet).
 
+Please note that this only works on the browser/ front-end for now, and does not work on a NodeJS backend.
+
 ## Installation & Usage
 
 ```sh
