@@ -3,14 +3,14 @@
  */
 export default function greenlet(fn) {
 	let w = new Worker(URL.createObjectURL(new Blob([
-			'onmessage='+(
+			'onmessage=('+(
 				f => ({ data }) => Promise.resolve().then(
 					() => f.apply(f, data[1])
 				).then(
 					d => { postMessage([data[0], null, d]); },
 					e => { postMessage([data[0], ''+e]); }
 				)
-			)+'('+fn+')'
+			)+')('+fn+')'
 		]))),
 		c = 0,
 		p = {};
