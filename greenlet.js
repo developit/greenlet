@@ -4,8 +4,8 @@
 export default function greenlet(fn) {
 	const onMessage = originalFn =>
 		({ data }) =>
-			// run it's original function f, with data[1] as arguments
-			// postMessage with d as 3rd arg if promise is successful
+			// run it's original function, with data[1] as arguments
+			// postMessage with childData as 3rd arg if promise is successful
 			// otherwise post error as 2nd argument
 			Promise.resolve()
 				.then(
