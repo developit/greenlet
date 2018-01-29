@@ -1,13 +1,14 @@
 {
   "name": "greenlet",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Move an async function into its own thread.",
   "source": "greenlet.js",
   "main": "dist/greenlet.js",
   "module": "dist/greenlet.m.js",
   "scripts": {
     "prepare": "microbundle",
-    "test": "eslint *.js && npm run -s prepare && karmatic"
+    "test": "eslint *.js && npm run -s prepare && karmatic",
+    "release": "npm run -s prepare && npm test && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
   "eslintConfig": {
     "extends": "eslint-config-developit"
