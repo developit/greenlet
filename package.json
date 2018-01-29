@@ -14,7 +14,8 @@
     "extends": "eslint-config-developit"
   },
   "files": [
-    "greenlet.js"
+    "greenlet.js",
+    "dist"
   ],
   "repository": "developit/greenlet",
   "keywords": [
