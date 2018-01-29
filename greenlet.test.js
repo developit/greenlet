@@ -7,14 +7,14 @@ describe('greenlet', () => {
 		expect(g()).toEqual(jasmine.any(Promise));
 	});
 
-	it('should invoke sync funtions', async () => {
+	it('should invoke sync functions', async () => {
 		let foo = greenlet( a => 'foo: '+a );
 
 		let ret = await foo('test');
 		expect(ret).toEqual('foo: test');
 	});
 
-	it('should invoke async funtions', async () => {
+	it('should invoke async functions', async () => {
 		let bar = greenlet( a => new Promise( resolve => {
 			resolve('bar: '+a);
 		}));
