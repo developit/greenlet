@@ -13,7 +13,8 @@
   "eslintConfig": {
     "extends": "eslint-config-developit",
     "rules": {
-      "prefer-spread": 0
+      "prefer-spread": 0,
+      "prefer-rest-params": 0
     }
   },
   "files": [

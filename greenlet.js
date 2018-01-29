@@ -1,29 +1,28 @@
 /** Move an async function into its own thread.
  *  @param {Function} asyncFunction  An (async) function to run in a Worker.
+ *  @public
  */
 export default function greenlet(asyncFunction) {
-	// Create an "inline" worker
+	// Create an "inline" worker (1:1 at definition time)
 	let worker = new Worker(
 			// The URL is a pointer to a stringified function (as a blob object)
 			URL.createObjectURL(
 				new Blob([
 					// Register our wrapper function as the message handler
-					'onmessage=('+(
-						// f() is the user-supplied async function
-						userFunc => ({ data }) => Promise.resolve().then(
-							// invoking within then() captures exceptions in f() as rejections
-							() => userFunc.apply(userFunc, data[1])
-						).then(
-							d => {
-								// success handler - callback(id, null, result)
-								postMessage([data[0], null, d]);
-							},
-							e => {
-								// error handler - callback(id, err)
-								postMessage([data[0], ''+e]);
-							}
-						)
-					)+')('+asyncFunction+')'  // pass user-supplied function to the closure
+					'onmessage=(' + (
+						// userFunc() is the user-supplied async function
+						userFunc => e => {
+							// Invoking within then() captures exceptions in userFunc() as rejections
+							Promise.resolve(e.data[1]).then(
+								userFunc.apply.bind(userFunc, userFunc)
+							).then(
+								// success handler - callback(id, SUCCESS(0), result)
+								d => { postMessage([e.data[0], 0, d]); },
+								// error handler - callback(id, ERROR(1), error)
+								e => { postMessage([e.data[0], 1, ''+e]); }
+							);
+						}
+					) + ')(' + asyncFunction + ')'  // pass user-supplied function to the closure
 				])
 			)
 		),
@@ -34,18 +33,29 @@ export default function greenlet(asyncFunction) {
 		// Outward-facing promises store their "controllers" (`[request, reject]`) here:
 		promises = {};
 
-	// Handle RPC results/errors coming back out of the worker
-	worker.onmessage = ({ data: [id, err, result] }) => {
+	/** Handle RPC results/errors coming back out of the worker.
+	 *  Messages coming from the worker take the form `[id, status, result]`:
+	 *    id     - counter-based unique ID for the RPC call
+	 *    status - 0 for success, 1 for failure
+	 *    result - the result or error, depending on `status`
+	 */
+	worker.onmessage = e => {
 		// invoke the promise's resolve() or reject() depending on whether there was an error.
-		promises[id][err ? 1 : 0](err || result);
+		promises[e.data[0]][e.data[1]](e.data[2]);
+
 		// ... then delete the promise controller
-		delete promises[id];
+		promises[e.data[0]] = null;
 	};
 
 	// Return a proxy function that forwards calls to the worker & returns a promise for the result.
-	return (...args) => new Promise( (resolve, reject) => {
-		promises[++currentId] = [resolve, reject];
-		// Send an RPC call to the worker - call(id, params)
-		worker.postMessage([currentId, args]);
-	});
+	return function(args) {
+		args = [].slice.call(arguments);
+		return new Promise(function() {
+			// Add the promise controller to the registry
+			promises[++currentId] = arguments;
+
+			// Send an RPC call to the worker - call(id, params)
+			worker.postMessage([currentId, args]);
+		});
+	};
 }
