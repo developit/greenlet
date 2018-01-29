@@ -46,6 +46,7 @@ let getName = greenlet( async username => {
 console.log(await getName('developit'))
 ```
 
+[🔄 **Run this example on JSFiddle**](https://jsfiddle.net/developit/mf9fbma5/)
 
 ## License
 
