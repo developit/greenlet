@@ -48,6 +48,8 @@ console.log(await getName('developit'))
 
 [🔄 **Run this example on JSFiddle**](https://jsfiddle.net/developit/mf9fbma5/)
 
-## License
+## License & Credits
 
-[MIT](https://oss.ninja/mit/developit)
+> In addition to the contributors, credit goes to [@sgb-io](https://github.com/sgb-io) for his annotated exploration of Greenlet's source. This prompted a refactor that clarified the code and allowed for further size optimizations.
+
+[MIT License](https://oss.ninja/mit/developit)
