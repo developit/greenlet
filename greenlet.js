@@ -4,7 +4,7 @@
  */
 export default function greenlet(asyncFunction) {
 	// Create an "inline" worker (1:1 at definition time)
-	let worker = new Worker(
+	const worker = new Worker(
 			// The URL is a pointer to a stringified function (as a blob object)
 			URL.createObjectURL(
 				new Blob([
