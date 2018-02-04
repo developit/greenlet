@@ -1,3 +1,17 @@
+/**
+ * Checks whether an object implements a Transferable interface
+ * @param {*} obj
+ * obj to check for Transferable interface
+ */
+function isTransferable(obj) {
+	// https://developer.mozilla.org/en-US/docs/Web/API/Transferable
+	return (
+		obj instanceof ArrayBuffer ||
+		obj instanceof MessagePort ||
+		obj instanceof ImageBitmap
+	);
+}
+
 /** Move an async function into its own thread.
  *  @param {Function} asyncFunction  An (async) function to run in a Worker.
  *  @public
@@ -5,21 +19,37 @@
 export default function greenlet(asyncFunction) {
 	// Create an "inline" worker (1:1 at definition time)
 	let worker = new Worker(
-			// The URL is a pointer to a stringified function (as a blob object)
+		// The URL is a pointer to a stringified function (as a blob object)
 			URL.createObjectURL(
 				new Blob([
 					// Register our wrapper function as the message handler
 					'onmessage=(' + (
 						// userFunc() is the user-supplied async function
 						userFunc => e => {
+							// To check whether an obj is transferable
+							function isTransferable(obj) {
+								// https://developer.mozilla.org/en-US/docs/Web/API/Transferable
+								return (
+									obj instanceof ArrayBuffer ||
+									obj instanceof MessagePort ||
+									obj instanceof ImageBitmap
+								);
+							}
 							// Invoking within then() captures exceptions in userFunc() as rejections
 							Promise.resolve(e.data[1]).then(
 								userFunc.apply.bind(userFunc, userFunc)
 							).then(
 								// success handler - callback(id, SUCCESS(0), result)
-								d => { postMessage([e.data[0], 0, d]); },
+								d => {
+									if (isTransferable(d)) {
+										postMessage([e.data[0], 0, d], [d]);
+									}
+									else {
+										postMessage([e.data[0], 0, d]);
+									}
+								},
 								// error handler - callback(id, ERROR(1), error)
-								e => { postMessage([e.data[0], 1, ''+e]); }
+								er => { postMessage([e.data[0], 1, '' + er]); }
 							);
 						}
 					) + ')(' + asyncFunction + ')'  // pass user-supplied function to the closure
@@ -48,14 +78,14 @@ export default function greenlet(asyncFunction) {
 	};
 
 	// Return a proxy function that forwards calls to the worker & returns a promise for the result.
-	return function(args) {
+	return function (args) {
 		args = [].slice.call(arguments);
-		return new Promise(function() {
+		return new Promise(function () {
 			// Add the promise controller to the registry
 			promises[++currentId] = arguments;
 
 			// Send an RPC call to the worker - call(id, params)
-			worker.postMessage([currentId, args]);
+			worker.postMessage([currentId, args], args.filter(x => isTransferable(x)));
 		});
 	};
 }
