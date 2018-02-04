@@ -50,7 +50,7 @@ console.log(await getName('developit'))
 
 ## Transferable ready
 
-Greenlet will even accept and optimize [transferables](https://developer.mozilla.org/en-US/docs/Web/API/Transferable) as arguments to and from a greenlet worker functions.
+Greenlet will even accept and optimize [transferables](https://developer.mozilla.org/en-US/docs/Web/API/Transferable) as arguments to and from a greenlet worker function.
 
 ## License & Credits
 
