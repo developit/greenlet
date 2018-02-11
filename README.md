@@ -48,9 +48,25 @@ console.log(await getName('developit'))
 
 [🔄 **Run this example on JSFiddle**](https://jsfiddle.net/developit/mf9fbma5/)
 
+
 ## Transferable ready
 
 Greenlet will even accept and optimize [transferables](https://developer.mozilla.org/en-US/docs/Web/API/Transferable) as arguments to and from a greenlet worker function.
+
+
+## Browser support
+
+Thankfully, Web Workers have been around for a while and [are broadly supported](https://caniuse.com/#feat=webworkers) by Chrome, Firefox, Safari, Edge, and Internet Explorer 10+.
+
+If you still need to support older browsers, you can just check for the presence of `window.Worker`:
+
+```js
+if (window.Worker) {
+    ...
+} else {
+    ...
+}
+```
 
 ## License & Credits
 
