@@ -1,17 +1,3 @@
-/**
- * Checks whether an object implements a Transferable interface
- * @param {*} obj
- * obj to check for Transferable interface
- */
-function isTransferable(obj) {
-	// https://developer.mozilla.org/en-US/docs/Web/API/Transferable
-	return (
-		obj instanceof ArrayBuffer ||
-		obj instanceof MessagePort ||
-		obj instanceof ImageBitmap
-	);
-}
-
 /** Move an async function into its own thread.
  *  @param {Function} asyncFunction  An (async) function to run in a Worker.
  *  @public
@@ -26,27 +12,17 @@ export default function greenlet(asyncFunction) {
 					'onmessage=(' + (
 						// userFunc() is the user-supplied async function
 						userFunc => e => {
-							// To check whether an obj is transferable
-							function isTransferable(obj) {
-								// https://developer.mozilla.org/en-US/docs/Web/API/Transferable
-								return (
-									obj instanceof ArrayBuffer ||
-									obj instanceof MessagePort ||
-									obj instanceof ImageBitmap
-								);
-							}
 							// Invoking within then() captures exceptions in userFunc() as rejections
 							Promise.resolve(e.data[1]).then(
 								userFunc.apply.bind(userFunc, userFunc)
 							).then(
 								// success handler - callback(id, SUCCESS(0), result)
+								// if `d` is transferrable transfer zero-copy
 								d => {
-									if (isTransferable(d)) {
-										postMessage([e.data[0], 0, d], [d]);
-									}
-									else {
-										postMessage([e.data[0], 0, d]);
-									}
+									postMessage([e.data[0], 0, d], (
+										d instanceof ArrayBuffer ||
+										d instanceof MessagePort ||
+										d instanceof ImageBitmap) ? [d] : []);
 								},
 								// error handler - callback(id, ERROR(1), error)
 								er => { postMessage([e.data[0], 1, '' + er]); }
@@ -85,7 +61,12 @@ export default function greenlet(asyncFunction) {
 			promises[++currentId] = arguments;
 
 			// Send an RPC call to the worker - call(id, params)
-			worker.postMessage([currentId, args], args.filter(x => isTransferable(x)));
+			// The filter is to provide a list of transferrables to send zero-copy
+			worker.postMessage([currentId, args], args.filter(x => (
+				x instanceof ArrayBuffer ||
+				x instanceof MessagePort ||
+				x instanceof ImageBitmap
+			)));
 		});
 	};
 }
