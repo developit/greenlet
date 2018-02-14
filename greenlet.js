@@ -17,7 +17,7 @@ export default function greenlet(asyncFunction) {
 								userFunc.apply.bind(userFunc, userFunc)
 							).then(
 								// success handler - callback(id, SUCCESS(0), result)
-								// if `d` is transferrable transfer zero-copy
+								// if `d` is transferable transfer zero-copy
 								d => {
 									postMessage([e.data[0], 0, d], (
 										d instanceof ArrayBuffer ||
@@ -61,7 +61,7 @@ export default function greenlet(asyncFunction) {
 			promises[++currentId] = arguments;
 
 			// Send an RPC call to the worker - call(id, params)
-			// The filter is to provide a list of transferrables to send zero-copy
+			// The filter is to provide a list of transferables to send zero-copy
 			worker.postMessage([currentId, args], args.filter(x => (
 				x instanceof ArrayBuffer ||
 				x instanceof MessagePort ||
