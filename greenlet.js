@@ -4,34 +4,28 @@
  */
 export default function greenlet(asyncFunction) {
 	// Create an "inline" worker (1:1 at definition time)
-	let worker = new Worker(
-			// The URL is a pointer to a stringified function (as a blob object)
-			URL.createObjectURL(
-				new Blob([
-					// Register our wrapper function as the message handler
-					'onmessage=(' + (
-						// userFunc() is the user-supplied async function
-						userFunc => e => {
-							// Invoking within then() captures exceptions in userFunc() as rejections
-							Promise.resolve(e.data[1]).then(
-								userFunc.apply.bind(userFunc, userFunc)
-							).then(
-								// success handler - callback(id, SUCCESS(0), result)
-								d => { postMessage([e.data[0], 0, d]); },
-								// error handler - callback(id, ERROR(1), error)
-								e => { postMessage([e.data[0], 1, ''+e]); }
-							);
-						}
-					) + ')(' + asyncFunction + ')'  // pass user-supplied function to the closure
-				])
-			)
-		),
+	// Register our wrapper function as the message handler
+	let code = 'onmessage=(' + (
+		// userFunc() is the user-supplied async function
+		userFunc => e => {
+			// Invoking within then() captures exceptions in userFunc() as rejections
+			Promise.resolve(e.data[1]).then(
+				userFunc.apply.bind(userFunc, userFunc)
+			).then(
+				// success handler - callback(id, SUCCESS(0), result)
+				d => { postMessage([e.data[0], 0, d]); },
+				// error handler - callback(id, ERROR(1), error)
+				e => { postMessage([e.data[0], 1, ''+e]); }
+			);
+		}
+	) + ')(' + asyncFunction + ')';  // pass user-supplied function to the closure
+	let worker = new Worker(URL.createObjectURL(new Blob([code])));
 
-		// A simple counter is used to generate worker-global unique ID's for RPC:
-		currentId = 0,
+	// A simple counter is used to generate worker-global unique ID's for RPC:
+	let currentId = 0;
 
-		// Outward-facing promises store their "controllers" (`[request, reject]`) here:
-		promises = {};
+	// Outward-facing promises store their "controllers" (`[request, reject]`) here:
+	let promises = {};
 
 	/** Handle RPC results/errors coming back out of the worker.
 	 *  Messages coming from the worker take the form `[id, status, result]`:
