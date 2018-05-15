@@ -2,7 +2,7 @@
   <img src="https://i.imgur.com/e8XbYbd.png" width="1000" alt="Greenlet">
 </p>
 
-## Greenlet [![npm](https://img.shields.io/npm/v/greenlet.svg)](https://npm.im/greenlet) [![travis](https://travis-ci.org/developit/greenlet.svg?branch=master)](https://travis-ci.org/developit/greenlet) [![gzip size](http://img.badgesize.io/https://unpkg.com/greenlet@1.0.1/dist/greenlet.umd.js?compression=gzip)](https://unpkg.com/greenlet@1.0.1/dist/greenlet.umd.js) [![install size](https://packagephobia.now.sh/badge?p=greenlet)](https://packagephobia.now.sh/result?p=greenlet)
+## Greenlet [![npm](https://img.shields.io/npm/v/greenlet.svg)](https://npm.im/greenlet) [![travis](https://travis-ci.org/developit/greenlet.svg?branch=master)](https://travis-ci.org/developit/greenlet) [![gzip size](http://img.badgesize.io/https://unpkg.com/greenlet/dist/greenlet.umd.js?compression=gzip)](https://unpkg.com/greenlet/dist/greenlet.umd.js) [![install size](https://packagephobia.now.sh/badge?p=greenlet)](https://packagephobia.now.sh/result?p=greenlet)
 
 > Move an async function into its own thread.
 >
