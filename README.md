@@ -71,7 +71,7 @@ if (window.Worker) {
 ### CSP
 
 If your app has a [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy),
-Greenlet require `worker-src blob:` and `script-src blob:` in your config.
+Greenlet require `worker-src data:` and `script-src data:` in your config.
 
 ## License & Credits
 
