@@ -16,8 +16,8 @@ export default function greenlet(asyncFunction) {
 			/* global $$ */
 
 			// Invoking within then() captures exceptions in the supplied async function as rejections
-			Promise.resolve().then(
-				$$.bind.apply($$, e.data)
+			Promise.resolve(e.data[1]).then(
+				v => $$.apply($$, v)
 			).then(
 				// success handler - callback(id, SUCCESS(0), result)
 				// if `d` is transferable transfer zero-copy
