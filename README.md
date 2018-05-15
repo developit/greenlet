@@ -68,6 +68,11 @@ if (window.Worker) {
 }
 ```
 
+### CSP
+
+If your app has a [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy),
+Greenlet require `worker-src data:` and `script-src data:` in your config.
+
 ## License & Credits
 
 > In addition to the contributors, credit goes to [@sgb-io](https://github.com/sgb-io) for his annotated exploration of Greenlet's source. This prompted a refactor that clarified the code and allowed for further size optimizations.
