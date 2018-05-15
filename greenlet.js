@@ -3,41 +3,65 @@
  *  @public
  */
 export default function greenlet(asyncFunction) {
+	// A simple counter is used to generate worker-global unique ID's for RPC:
+	let currentId = 0;
+
+	// Outward-facing promises store their "controllers" (`[request, reject]`) here:
+	const promises = {};
+
 	// Create an "inline" worker (1:1 at definition time)
-	let worker = new Worker(
+	const worker = new Worker(
+		'data:,$$='+asyncFunction+';onmessage='+(e => {
+			/* global $$ */
+
+			// Invoking within then() captures exceptions in userFunc() as rejections
+			Promise.resolve().then(
+				$$.bind.apply($$, e.data)
+			).then(
+				// success handler - callback(id, SUCCESS(0), result)
+				// if `d` is transferable transfer zero-copy
+				d => {
+					postMessage([e.data[0], 0, d], [d].filter(x => (
+						(x instanceof ArrayBuffer) ||
+						(x instanceof MessagePort) ||
+						(x instanceof ImageBitmap)
+					)));
+				},
+				// error handler - callback(id, ERROR(1), error)
+				er => { postMessage([e.data[0], 1, '' + er]); }
+			);
+		})
+
+		/*
 		// The URL is a pointer to a stringified function (as a blob object)
-			URL.createObjectURL(
-				new Blob([
-					// Register our wrapper function as the message handler
-					'onmessage=(' + (
-						// userFunc() is the user-supplied async function
-						userFunc => e => {
-							// Invoking within then() captures exceptions in userFunc() as rejections
-							Promise.resolve(e.data[1]).then(
-								userFunc.apply.bind(userFunc, userFunc)
-							).then(
-								// success handler - callback(id, SUCCESS(0), result)
-								// if `d` is transferable transfer zero-copy
-								d => {
-									postMessage([e.data[0], 0, d], (
-										d instanceof ArrayBuffer ||
-										d instanceof MessagePort ||
-										d instanceof ImageBitmap) ? [d] : []);
-								},
-								// error handler - callback(id, ERROR(1), error)
-								er => { postMessage([e.data[0], 1, '' + er]); }
-							);
-						}
-					) + ')(' + asyncFunction + ')'  // pass user-supplied function to the closure
-				])
-			)
-		),
-
-		// A simple counter is used to generate worker-global unique ID's for RPC:
-		currentId = 0,
-
-		// Outward-facing promises store their "controllers" (`[request, reject]`) here:
-		promises = {};
+		URL.createObjectURL(
+			new Blob([
+				'$$=', asyncFunction,
+				// Register our wrapper function as the message handler
+				';onmessage=',
+				// userFunc() is the user-supplied async function
+				e => {
+					// Invoking within then() captures exceptions in userFunc() as rejections
+					Promise.resolve().then(
+						$$.bind.apply($$, e.data)
+					).then(
+						// success handler - callback(id, SUCCESS(0), result)
+						// if `d` is transferable transfer zero-copy
+						d => {
+							postMessage([e.data[0], 0, d], [d].filter(x => (
+								(x instanceof ArrayBuffer) ||
+								(x instanceof MessagePort) ||
+								(x instanceof ImageBitmap)
+							)));
+						},
+						// error handler - callback(id, ERROR(1), error)
+						er => { postMessage([e.data[0], 1, '' + er]); }
+					);
+				}
+			])
+		)
+		*/
+	);
 
 	/** Handle RPC results/errors coming back out of the worker.
 	 *  Messages coming from the worker take the form `[id, status, result]`:
@@ -63,9 +87,9 @@ export default function greenlet(asyncFunction) {
 			// Send an RPC call to the worker - call(id, params)
 			// The filter is to provide a list of transferables to send zero-copy
 			worker.postMessage([currentId, args], args.filter(x => (
-				x instanceof ArrayBuffer ||
-				x instanceof MessagePort ||
-				x instanceof ImageBitmap
+				(x instanceof ArrayBuffer) ||
+				(x instanceof MessagePort) ||
+				(x instanceof ImageBitmap)
 			)));
 		});
 	};
