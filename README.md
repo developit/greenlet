@@ -6,7 +6,7 @@
 
 > Move an async function into its own thread.
 >
-> A simplified single-function version of [workerize](https://github.com/developit/workerize).
+> A simplified single-function version of [workerize](https://github.com/developit/workerize), offering [the same performance as direct Worker usage](https://esbench.com/bench/5b16b61af2949800a0f61ce3).
 
 The name is somewhat of a poor choice, but it was [available on npm](https://npm.im/greenlet).
 
