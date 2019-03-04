@@ -9,30 +9,30 @@ export default function greenlet(asyncFunction) {
 	// Outward-facing promises store their "controllers" (`[request, reject]`) here:
 	const promises = {};
 
-	// Create an "inline" worker (1:1 at definition time)
-	const worker = new Worker(
-		// Use a data URI for the worker's src. It inlines the target function and an RPC handler:
-		'data:,$$='+asyncFunction+';onmessage='+(e => {
-			/* global $$ */
+	// Use a data URI for the worker's src. It inlines the target function and an RPC handler:
+	const script = 'data:$$='+asyncFunction+';onmessage='+(e => {
+		/* global $$ */
 
-			// Invoking within then() captures exceptions in the supplied async function as rejections
-			Promise.resolve(e.data[1]).then(
-				v => $$.apply($$, v)
-			).then(
-				// success handler - callback(id, SUCCESS(0), result)
-				// if `d` is transferable transfer zero-copy
-				d => {
-					postMessage([e.data[0], 0, d], [d].filter(x => (
-						(x instanceof ArrayBuffer) ||
-						(x instanceof MessagePort) ||
-						(x instanceof ImageBitmap)
-					)));
-				},
-				// error handler - callback(id, ERROR(1), error)
-				er => { postMessage([e.data[0], 1, '' + er]); }
-			);
-		})
-	);
+		// Invoking within then() captures exceptions in the supplied async function as rejections
+		Promise.resolve(e.data[1]).then(
+			v => $$.apply($$, v)
+		).then(
+			// success handler - callback(id, SUCCESS(0), result)
+			// if `d` is transferable transfer zero-copy
+			d => {
+				postMessage([e.data[0], 0, d], [d].filter(x => (
+					(x instanceof ArrayBuffer) ||
+					(x instanceof MessagePort)
+				)));
+			},
+			// error handler - callback(id, ERROR(1), error)
+			er => { postMessage([e.data[0], 1, '' + er]); }
+		);
+	});
+	const blob = new Blob([script]);
+	const workerURL = URL.createObjectURL(blob);
+	// Create an "inline" worker (1:1 at definition time)
+	const worker = new Worker(workerURL);
 
 	/** Handle RPC results/errors coming back out of the worker.
 	 *  Messages coming from the worker take the form `[id, status, result]`:
@@ -59,8 +59,7 @@ export default function greenlet(asyncFunction) {
 			// The filter is to provide a list of transferables to send zero-copy
 			worker.postMessage([currentId, args], args.filter(x => (
 				(x instanceof ArrayBuffer) ||
-				(x instanceof MessagePort) ||
-				(x instanceof ImageBitmap)
+				(x instanceof MessagePort)
 			)));
 		});
 	};
