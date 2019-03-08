@@ -59,7 +59,8 @@ export default function greenlet(asyncFunction) {
 			// The filter is to provide a list of transferables to send zero-copy
 			worker.postMessage([currentId, args], args.filter(x => (
 				(x instanceof ArrayBuffer) ||
-				(x instanceof MessagePort)
+				(x instanceof MessagePort) ||
+        (createImageBitmap && x instanceof ImageBitmap)
 			)));
 		});
 	};
