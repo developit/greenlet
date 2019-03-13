@@ -22,7 +22,8 @@ export default function greenlet(asyncFunction) {
 			d => {
 				postMessage([e.data[0], 0, d], [d].filter(x => (
 					(x instanceof ArrayBuffer) ||
-					(x instanceof MessagePort)
+					(x instanceof MessagePort) ||
+					(self.ImageBitmap && x instanceof ImageBitmap)
 				)));
 			},
 			// error handler - callback(id, ERROR(1), error)
@@ -60,7 +61,7 @@ export default function greenlet(asyncFunction) {
 			worker.postMessage([currentId, args], args.filter(x => (
 				(x instanceof ArrayBuffer) ||
 				(x instanceof MessagePort) ||
-        (createImageBitmap && x instanceof ImageBitmap)
+        (window.createImageBitmap && x instanceof ImageBitmap)
 			)));
 		});
 	};
