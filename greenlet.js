@@ -10,7 +10,7 @@ export default function greenlet(asyncFunction) {
 	const promises = {};
 
 	// Use a data URI for the worker's src. It inlines the target function and an RPC handler:
-	const script = 'data:$$='+asyncFunction+';onmessage='+(e => {
+	const script = '$$='+asyncFunction+';onmessage='+(e => {
 		/* global $$ */
 
 		// Invoking within then() captures exceptions in the supplied async function as rejections
@@ -30,8 +30,7 @@ export default function greenlet(asyncFunction) {
 			er => { postMessage([e.data[0], 1, '' + er]); }
 		);
 	});
-	const blob = new Blob([script]);
-	const workerURL = URL.createObjectURL(blob);
+	const workerURL = URL.createObjectURL(new Blob([script]));
 	// Create an "inline" worker (1:1 at definition time)
 	const worker = new Worker(workerURL);
 
@@ -61,7 +60,7 @@ export default function greenlet(asyncFunction) {
 			worker.postMessage([currentId, args], args.filter(x => (
 				(x instanceof ArrayBuffer) ||
 				(x instanceof MessagePort) ||
-        (window.createImageBitmap && x instanceof ImageBitmap)
+				(self.ImageBitmap && x instanceof ImageBitmap)
 			)));
 		});
 	};
