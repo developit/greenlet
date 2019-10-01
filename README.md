@@ -10,7 +10,7 @@
 
 The name is somewhat of a poor choice, but it was [available on npm](https://npm.im/greenlet).
 
-_Greenlet only supports browser environments, since it uses [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers). For use in a NodeJS environment, Web Workers must be polyfilled using a library like [node-webworker](https://github.com/pgriess/node-webworker)._
+_Greenlet supports IE10+, since it uses [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers). For NodeJS usage, Web Workers must be polyfilled using a library like [node-webworker](https://github.com/pgriess/node-webworker)._
 
 ## Installation & Usage
 
