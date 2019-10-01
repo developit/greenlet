@@ -26,6 +26,16 @@ Accepts an async function with, produces a copy of it that runs within a Web Wor
 greenlet(Function) -> Function
 ```
 
+> ‼️ **Important:** never call greenlet() dynamically. Doing so creates a new Worker thread for every call:
+
+```diff
+-const BAD = () => greenlet(x => x)('bad') // creates a new thread on every call
++const fn = greenlet(x => x);
++const GOOD = () => fn('good'); // uses the same thread on every call
+```
+
+Since Greenlets can't rely on surrounding scope anyway, it's best to always create them at the "top" of your module.
+
 
 ## Example
 
