@@ -1,3 +1,5 @@
-type AsyncFunction<T> = (...args: any[]) => Promise<T>;
+type AsyncFunction<S extends any[], T> = (...args: S) => Promise<T>;
 
-export default function greenlet<T extends AsyncFunction<U>, U>(fn: T): T;
+type MaybeAsyncFunction<S extends any[], T> = (...args: S) => (T | Promise<T>);
+
+export default function greenlet<S extends any[], T>(fn: MaybeAsyncFunction<S, T>): AsyncFunction<S, T>;
