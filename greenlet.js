@@ -3,6 +3,12 @@
  *  @public
  */
 export default function greenlet(asyncFunction) {
+	// Type checking the argument.
+	const type = typeof asyncFunction;
+	if (type !== 'function') {
+		throw new TypeError('Expected function but recevied ' + type);
+	}
+
 	// A simple counter is used to generate worker-global unique ID's for RPC:
 	let currentId = 0;
 
