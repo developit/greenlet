@@ -27,17 +27,18 @@ export default function greenlet(asyncFunction, options = {}) {
 		));
 		const [promiseID, args, status, genID] = e.data;
 		/* global $$, GENS, USET */
-		if ($$.constructor.name === 'AsyncGeneratorFunction' || $$.constructor.name === 'GeneratorFunction') {
-			Promise.resolve(args).then(
-				// either apply the generator function or use it's iterator
-				v => !GENS[genID] ? $$.apply($$, v) : GENS[genID][status](v[0])
-			).then(
-				// success handler - callback(id, SUCCESS(0))
-				// if `d` is transferable transfer zero-copy
-				d => {
+		Promise.resolve(args).then(
+			// either apply the async/generator/async generator function or use a generator function's iterator
+			v => !GENS[genID] ? $$.apply($$, v) : GENS[genID][status](v[0])
+		).then(
+			// success handler - callback(id, SUCCESS(0))
+			// if `d` is transferable transfer zero-copy
+			d => {
+				if ($$.constructor.name === 'AsyncGeneratorFunction' || $$.constructor.name === 'GeneratorFunction') {
 					// setup the generator
 					if (!GENS[genID]) {
 						GENS[genID] = [d.next.bind(d), d.return.bind(d), d.throw.bind(d)];
+						// return an initial message of success.
 						return postMessage([promiseID, 0, { value: undefined, done: false }]);
 					}
 					// yield the value
@@ -45,25 +46,15 @@ export default function greenlet(asyncFunction, options = {}) {
 					if (d.done) {
 						GENS[promiseID] = null;
 					}
-				},
-				// error handler - callback(id, ERROR(1), error)
-				er => { postMessage([promiseID, 1, '' + er]); }
-			);
-		}
-		else {
-			// Invoking within then() captures exceptions in the supplied async function as rejections
-			Promise.resolve(args).then(
-				v => $$.apply($$, v)
-			).then(
-				// success handler - callback(id, SUCCESS(0), result)
-				// if `d` is transferable transfer zero-copy
-				d => {
+				}
+				else {
+					// here we know it's just an async function that needs it's return value.
 					postMessage([promiseID, 0, d], getTransferables([d]));
-				},
-				// error handler - callback(id, ERROR(1), error)
-				er => { postMessage([e.data[0], 1, '' + er]); }
-			);
-		}
+				}
+			},
+			// error handler - callback(id, ERROR(1), error)
+			er => { postMessage([promiseID, 1, '' + er]); }
+		);
 	});
 	const workerURL = URL.createObjectURL(new Blob([script]));
 	// Create an "inline" worker (1:1 at definition time)
