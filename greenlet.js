@@ -20,13 +20,13 @@ export default function greenlet(asyncFunction, options = {}) {
 
 	// Use a data URI for the worker's src. It inlines the target function and an RPC handler:
 	const script = `$$=${asyncFunction};USET=${useTransferables};GENS={};onmessage=` + (e => {
+		/* global $$, GENS, USET */
 		const getTransferables = d => !USET ? [] : d.filter(x => (
 			(x instanceof ArrayBuffer) ||
 			(x instanceof MessagePort) ||
 			(self.ImageBitmap && x instanceof ImageBitmap)
 		));
 		const [promiseID, args, status, genID] = e.data;
-		/* global $$, GENS, USET */
 		Promise.resolve(args).then(
 			// either apply the async/generator/async generator function or use a generator function's iterator
 			v => !GENS[genID] ? $$.apply($$, v) : GENS[genID][status](v[0])
