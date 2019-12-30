@@ -44,7 +44,7 @@ export default function greenlet(asyncFunction, options = {}) {
 					// yield the value
 					postMessage([promiseID, 0, d], getTransferables([d.value]));
 					if (d.done) {
-						GENS[promiseID] = null;
+						GENS[genID] = null;
 					}
 				}
 				else {
