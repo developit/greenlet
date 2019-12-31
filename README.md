@@ -58,6 +58,43 @@ console.log(await getName('developit'))
 
 [🔄 **Run this example on JSFiddle**](https://jsfiddle.net/developit/mf9fbma5/)
 
+## Generator Example
+
+Greenlet can now work with `Generators` and `AsyncGenerators` and will always return an `AsyncGenerator` in their
+place. This means you can fetch small portions of data as you need it.
+
+```js
+import greenlet from '../greenlet.js';
+
+let lazyGetRepos = greenlet(async function* (username, returnNumber = 10) {
+	let url = `https://api.github.com/users/${username}/repos`;
+	let res = await fetch(url);
+	let repos = await res.json();
+	while (repos.length > 0) {
+		let newReturnNumber = yield repos.splice(0, returnNumber);
+		if (typeof newReturnNumber !== 'undefined') {
+			returnNumber = newReturnNumber;
+		}
+	}
+});
+
+const repoIter = lazyGetRepos('developit', 5);
+// you could call these over any amount of time...
+console.log(await repoIter.next()); // {value: Array(5), done: false}
+console.log(await repoIter.next()); // {value: Array(5), done: false}
+console.log(await repoIter.next(10)); // {value: Array(10), done: false}
+// when your done clean up the asyncIterator
+console.log(await repoIter.return()); // {value: undefined, done: true}
+
+// or use for await of syntax to iterate through all values;
+const repoIter2 = lazyGetRepos('developit', 5);
+
+for await (const repos of repoIter2) {
+	console.log(items);
+}
+// no need to clean up if you have exhausted the iterator.
+```
+
 
 ## Transferable ready
 
