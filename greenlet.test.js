@@ -57,15 +57,18 @@ describe('greenlet', () => {
 
 	it('should return both done as true and the value', async () => {
 		// eslint-disable-next-line require-yield
-		let g = greenlet(function* (num1) {
+		function* f (num1) {
 			return num1;
-		});
+		}
+		let g = greenlet(f);
 
 		const it = g(3);
+		const it2 = f(3);
 		const { done, value } = (await it.next());
+		const { done: done2, value: value2 } = (await it2.next());
 
-		expect(value).toEqual(3);
-		expect(done).toEqual(true);
+		expect(value).toEqual(value2);
+		expect(done).toEqual(done2);
 	});
 
 	it('should only iterate yielded values with for await of', async () => {
@@ -111,7 +114,7 @@ describe('greenlet', () => {
 			{ value: undefined, done: true }
 		]);
 	});
-
+	
 	it('should throw early with return method of async iterator', async () => {
 		let g = greenlet(function* () {
 			yield 1;
@@ -159,6 +162,60 @@ describe('greenlet', () => {
 			await it2.next(),
 			await it2.next(),
 			await it2.next()
+		]);
+	});
+
+	it('should throw like an equivalent async iterator', async () => {
+		async function* noG () {
+			const num2 = yield 1;
+			yield 2 + num2;
+			yield 3;
+			return 4;
+		}
+		
+		let g = greenlet(noG);
+
+
+		const it = g();
+		const it2 = noG();
+		expect([
+			await it.next(),
+			await it.next(2),
+			await it.throw().catch(e => 2),
+			await it.return(),
+			await it.throw().catch(e => 3)
+		]).toEqual([
+			await it2.next(),
+			await it2.next(2),
+			await it2.throw().catch(e => 2),
+			await it2.return(),
+			await it2.throw().catch(e => 3)
+		]);
+	});
+
+	it('should return like an equivalent async iterator', async () => {
+		async function* noG () {
+			const num2 = yield 1;
+			yield 2 + num2;
+			yield 3;
+			return 4;
+		}
+		
+		let g = greenlet(noG);
+
+
+		const it = g();
+		const it2 = noG();
+		expect([
+			await it.next(),
+			await it.next(2),
+			await it.return(),
+			await it.return()
+		]).toEqual([
+			await it2.next(),
+			await it2.next(2),
+			await it2.return(),
+			await it2.return()
 		]);
 	});
 });

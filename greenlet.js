@@ -88,30 +88,33 @@ export default function greenlet(asyncFunction, options = {}) {
 	});
 	// if it's a generator or async generator function return a async generator function.
 	if (asyncFunction.constructor.name === 'AsyncGeneratorFunction' || asyncFunction.constructor.name === 'GeneratorFunction') {
-		return async function* workerPassthrough(...args) {
+		return function workerPassthrough () {
 			const genID = ++genIds;
-			try {
-				let result = await passMessagePromise(args, 0, genID);
-				let value;
-				while (!result.done) {
-					// request next value
-					result = await passMessagePromise([value], 0, genID);
-					if (result.done) {
-						break;
-					}
-					value = yield result.value;
+			const init = passMessagePromise([].slice.call(arguments), 0, genID);
+			return {
+				done: false,
+				async next (value) {
+					await init;
+					if (this.done) { return { value: undefined, done: true }; }
+					const result = await passMessagePromise([value], 0, genID);
+					if (result.done) { return this.return(result.value); }
+					return result;
+				},
+				async return (value) {
+					await init;
+					await passMessagePromise([undefined], 1, genID);
+					this.done = true;
+					return { value, done: true };
+				},
+				async throw (err) {
+					await init;
+					await passMessagePromise(['' + err], 2, genID);
+					throw err;
+				},
+				[Symbol.asyncIterator] () {
+					return this;
 				}
-				return result.value;
-			}
-			catch (err) {
-				// send error message
-				await passMessagePromise(['' + err], 2, genID);
-				throw err;
-			}
-			finally {
-				// send return message
-				await passMessagePromise([undefined], 1, genID);
-			}
+			};
 		};
 	}
 
