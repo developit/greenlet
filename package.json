@@ -38,7 +38,7 @@
     "eslint": "^7.21.0",
     "eslint-config-developit": "^1.2.0",
     "karmatic": "^1.4.0",
-    "microbundle": "^0.4.3",
+    "microbundle": "^0.13.0",
     "webpack": "^4.29.6"
   }
 }
