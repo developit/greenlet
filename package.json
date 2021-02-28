@@ -35,8 +35,8 @@
   "license": "MIT",
   "homepage": "https://github.com/developit/greenlet",
   "devDependencies": {
-    "eslint": "^4.16.0",
-    "eslint-config-developit": "^1.1.1",
+    "eslint": "^7.21.0",
+    "eslint-config-developit": "^1.2.0",
     "karmatic": "^1.4.0",
     "microbundle": "^0.4.3",
     "webpack": "^4.29.6"
