@@ -5,6 +5,8 @@
   "source": "greenlet.js",
   "main": "dist/greenlet.js",
   "module": "dist/greenlet.m.js",
+  "exports": "dist/greenlet.modern.js",
+  "unpkg": "dist/greenlet.umd.js",
   "types": "./index.d.ts",
   "scripts": {
     "prepare": "microbundle",
